@@ -21,6 +21,10 @@ pub mod vault {
     pub fn close(ctx: Context<Payment>) -> Result<()> {
         ctx.accounts.close_vault()
     }
+
+    pub fn close_state(ctx: Context<CloseState>) -> Result<()> {
+        ctx.accounts.close_state()
+    }
 }
 
 #[derive(Accounts)]
@@ -119,25 +123,27 @@ impl<'info> Payment<'info> {
         let _ = transfer(cpi_context, self.vault.lamports());
         Ok(())
     }
+    
+}
+#[derive(Accounts)]
+pub struct CloseState<'info> {
+    #[account(mut)]
+    pub user: Signer<'info>,
+    #[account(
+        mut,
+        seeds = [b"state".as_ref(), user.key().as_ref()],
+        bump= state.state_bumb,
+        close = user
+    )]
+    pub state: Account<'info, VaultState>,
+    pub system_program: Program<'info, System>,
+}
 
+impl<'info> CloseState<'info> {
     pub fn close_state(&mut self) -> Result<()> {
 
-        let cpi_program = self.system_program.to_account_info();
-
-        let seeds = &[b"state", self.user.to_account_info().key.as_ref(), &[self.state.state_bumb]];
-        let signer_seeds = &[&seeds[..]];
-
-        let cpi_accounts = Transfer{
-            from: self.state.to_account_info(),
-            to: self.user.to_account_info(),
-        };
-
-        let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
-
-        let _ = transfer(cpi_context, self.vault.lamports());
         Ok(())
     }
-    
 }
 
 #[account]
