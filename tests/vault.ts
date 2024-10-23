@@ -155,8 +155,22 @@ describe("vault test", () => {
     console.log("vault balance: ", balance);
     assert.equal(balance, 0);
 
-    const userBalance = await anchor.getProvider().connection.getBalance(user.publicKey);
+    let userBalance = await anchor.getProvider().connection.getBalance(user.publicKey);
     console.log("user balance: ", userBalance);
     assert.equal(userBalance + rentFeeOnStatePDA, 10 * LAMPORTS_PER_SOL);
+
+
+    const closeStateTx = await program.methods.closeState().accountsPartial({
+      user: user.publicKey,
+        state,
+        systemProgram: anchor.web3.SystemProgram.programId,
+    }).signers([user]).rpc().then(confirmTx);
+
+    userBalance = await anchor.getProvider().connection.getBalance(user.publicKey);
+    console.log("user balance: ", userBalance);
+
+    console.log("close transaction signature", closeStateTx);
+    assert.equal(userBalance, 10 * LAMPORTS_PER_SOL);
+
   });
 });
