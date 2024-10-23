@@ -119,6 +119,24 @@ impl<'info> Payment<'info> {
         let _ = transfer(cpi_context, self.vault.lamports());
         Ok(())
     }
+
+    pub fn close_state(&mut self) -> Result<()> {
+
+        let cpi_program = self.system_program.to_account_info();
+
+        let seeds = &[b"state", self.user.to_account_info().key.as_ref(), &[self.state.state_bumb]];
+        let signer_seeds = &[&seeds[..]];
+
+        let cpi_accounts = Transfer{
+            from: self.state.to_account_info(),
+            to: self.user.to_account_info(),
+        };
+
+        let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
+
+        let _ = transfer(cpi_context, self.vault.lamports());
+        Ok(())
+    }
     
 }
 
