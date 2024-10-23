@@ -7,18 +7,19 @@ pub mod vault {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        ctx.accounts.initialize(&ctx.bumps)?;
-        Ok(())
+        ctx.accounts.initialize(&ctx.bumps)
     }
 
     pub fn deposit(ctx: Context<Payment>, amount: u64) -> Result<()> {
-        ctx.accounts.deposit(amount)?;
-        Ok(())
+        ctx.accounts.deposit(amount)
     }
 
     pub fn withdraw(ctx: Context<Payment>, amount: u64) -> Result<()> {
-        ctx.accounts.withdraw(amount)?;
-        Ok(())
+        ctx.accounts.withdraw(amount)
+    }
+
+    pub fn close(ctx: Context<Payment>) -> Result<()> {
+        ctx.accounts.close_vault()
     }
 }
 
@@ -97,6 +98,24 @@ impl<'info> Payment<'info> {
         let _ = transfer(cpi_context, amount);
         Ok(())
     } 
+
+    pub fn close_vault(&mut self) -> Result<()> {
+
+        let cpi_program = self.system_program.to_account_info();
+
+        let seeds = &[b"vault", self.state.to_account_info().key.as_ref(), &[self.state.vault_bump]];
+        let signer_seeds = &[&seeds[..]];
+
+        let cpi_accounts = Transfer{
+            from: self.vault.to_account_info(),
+            to: self.user.to_account_info(),
+        };
+
+        let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
+
+        let _ = transfer(cpi_context, self.vault.lamports());
+        Ok(())
+    }
     
 }
 
