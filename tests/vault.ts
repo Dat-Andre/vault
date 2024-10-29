@@ -17,19 +17,6 @@ const confirmTx = async (signature: string) => {
   return signature
 }
 
-
-/* const transactionDetails = await anchor.getProvider().connection.getTransaction(tx, txConfig);
-
-        // Check if transaction details were returned successfully
-        if (transactionDetails) {
-            // Calculate the fee spent on this transaction
-            const fee = transactionDetails.meta.fee;
-            console.log("Transaction Fee:", fee);
-        } else {
-            console.log("Transaction details not found.");
-        }
-}; */
-
 describe("vault test", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.AnchorProvider.env());
