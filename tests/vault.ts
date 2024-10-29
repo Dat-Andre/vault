@@ -17,14 +17,6 @@ const confirmTx = async (signature: string) => {
   return signature
 }
 
-const getTxFeeSpent = async (signature: string) => {
-
-  const txConfig: GetVersionedTransactionConfig = {
-    commitment: 'confirmed',
-    maxSupportedTransactionVersion: 1
-
-}
-}
 
 /* const transactionDetails = await anchor.getProvider().connection.getTransaction(tx, txConfig);
 
@@ -67,15 +59,6 @@ describe("vault test", () => {
 
   it("Initialize vault", async () => {
 
-    /* const simulateResp = await program.methods.initialize().accountsPartial({
-      user: user.publicKey,
-      state,
-      vault,
-      systemProgram: anchor.web3.SystemProgram.programId,
-    }).simulate({skipPreflight: true});
-
-    console.log("simulateResp: ", simulateResp); */
-
     const tx = await program.methods.initialize().accountsPartial({
       user: user.publicKey,
       state,
@@ -117,9 +100,6 @@ describe("vault test", () => {
     const balance = await anchor.getProvider().connection.getBalance(vault);
     console.log("vault balance: ", balance);
     assert.equal(balance, 5 * LAMPORTS_PER_SOL);
-
-
-    /* const tx = await program.methods.initialize().rpc(); */
     
   });
 
